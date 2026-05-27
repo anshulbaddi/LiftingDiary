@@ -1,0 +1,109 @@
+import { format, parseISO } from "date-fns"
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { DatePicker } from "./_components/date-picker"
+import { getWorkoutsForDate } from "@/data/workouts"
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const { date } = await searchParams
+  const dateStr = typeof date === "string" ? date : format(new Date(), "yyyy-MM-dd")
+  const workouts = await getWorkoutsForDate(dateStr)
+  const displayDate = parseISO(dateStr)
+
+  return (
+    <main className="flex flex-col gap-8 px-6 py-8 max-w-3xl mx-auto w-full">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">View your workouts by date.</p>
+      </div>
+
+      <DatePicker dateStr={dateStr} />
+
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-medium">
+            Workouts for {format(displayDate, "MMMM d, yyyy")}
+          </h2>
+          <Badge variant="outline" className="text-muted-foreground">
+            {workouts.length} {workouts.length === 1 ? "session" : "sessions"}
+          </Badge>
+        </div>
+
+        {workouts.length === 0 ? (
+          <Card>
+            <CardContent className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+              No workouts logged for this date.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {workouts.map((workout) => {
+              const durationMin =
+                workout.completedAt
+                  ? Math.round(
+                      (workout.completedAt.getTime() - workout.startedAt.getTime()) / 60000,
+                    )
+                  : null
+
+              return (
+                <Card key={workout.id}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex flex-col gap-1">
+                        <CardTitle className="text-base">
+                          {format(workout.startedAt, "h:mm a")}
+                        </CardTitle>
+                        {durationMin !== null && (
+                          <CardDescription>{durationMin} min</CardDescription>
+                        )}
+                        {workout.notes && (
+                          <CardDescription>{workout.notes}</CardDescription>
+                        )}
+                      </div>
+                      <Badge variant="outline">
+                        {workout.workoutExercises.length}{" "}
+                        {workout.workoutExercises.length === 1 ? "exercise" : "exercises"}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  {workout.workoutExercises.length > 0 && (
+                    <CardContent>
+                      <div className="flex flex-col gap-3">
+                        {workout.workoutExercises.map((exercise) => (
+                          <div key={exercise.id} className="flex flex-col gap-1">
+                            <span className="text-sm font-medium">{exercise.name}</span>
+                            <div className="flex flex-col gap-0.5">
+                              {exercise.sets.map((set) => (
+                                <span
+                                  key={set.id}
+                                  className="text-sm text-muted-foreground"
+                                >
+                                  Set {set.setNumber} — {set.reps} reps @ {set.weight}{" "}
+                                  {set.unit}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </main>
+  )
+}
