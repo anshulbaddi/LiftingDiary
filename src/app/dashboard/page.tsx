@@ -77,10 +77,15 @@ export default async function DashboardPage({
                           <CardDescription>{workout.notes}</CardDescription>
                         )}
                       </div>
-                      <Badge variant="outline">
-                        {workout.workoutExercises.length}{" "}
-                        {workout.workoutExercises.length === 1 ? "exercise" : "exercises"}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">
+                          {workout.workoutExercises.length}{" "}
+                          {workout.workoutExercises.length === 1 ? "exercise" : "exercises"}
+                        </Badge>
+                        <Button asChild variant="ghost" size="sm">
+                          <Link href={`/dashboard/workout/${workout.id}`}>Edit</Link>
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   {workout.workoutExercises.length > 0 && (
