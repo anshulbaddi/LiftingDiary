@@ -23,7 +23,7 @@ export default async function DashboardPage({
   const displayDate = parseISO(dateStr)
 
   return (
-    <main className="flex flex-col gap-8 px-8 py-8 w-full">
+    <main className="flex flex-col gap-8 px-8 py-8 w-full flex-1 bg-background">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
