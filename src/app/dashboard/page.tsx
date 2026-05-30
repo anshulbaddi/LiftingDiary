@@ -17,9 +17,12 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const { date } = await searchParams
-  const dateStr = typeof date === "string" ? date : format(new Date(), "yyyy-MM-dd")
-  const workouts = await getWorkoutsForDate(dateStr)
+  const { date, tz } = await searchParams
+  const tzOffset = typeof tz === "string" ? parseInt(tz, 10) : 0
+  const dateStr = typeof date === "string"
+    ? date
+    : new Date(Date.now() - tzOffset * 60 * 1000).toISOString().slice(0, 10)
+  const workouts = await getWorkoutsForDate(dateStr, tzOffset)
   const displayDate = parseISO(dateStr)
 
   return (
@@ -30,7 +33,7 @@ export default async function DashboardPage({
           <p className="text-sm text-muted-foreground">View your workouts by date.</p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/workout/new">Log Workout</Link>
+          <Link href={`/dashboard/workout/new?date=${dateStr}`}>Log Workout</Link>
         </Button>
       </div>
 

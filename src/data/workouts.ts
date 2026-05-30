@@ -107,13 +107,15 @@ export async function updateWorkout(workoutId: string, input: UpdateWorkoutInput
   }
 }
 
-export async function getWorkoutsForDate(dateStr: string) {
+export async function getWorkoutsForDate(dateStr: string, tzOffset: number = 0) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const start = new Date(`${dateStr}T00:00:00.000Z`);
-  const end = new Date(start);
-  end.setUTCDate(end.getUTCDate() + 1);
+  // tzOffset = getTimezoneOffset() (positive = west of UTC, e.g. 420 for UTC-7)
+  // Shift UTC midnight by tzOffset minutes to get local midnight in UTC
+  const startMs = Date.parse(`${dateStr}T00:00:00Z`) + tzOffset * 60 * 1000;
+  const start = new Date(startMs);
+  const end = new Date(startMs + 24 * 60 * 60 * 1000);
 
   return db.query.workouts.findMany({
     where: and(

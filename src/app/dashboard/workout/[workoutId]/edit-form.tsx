@@ -39,7 +39,11 @@ function emptyExercise(): ExerciseRow {
 
 export default function EditWorkoutForm({ workout }: { workout: WorkoutForEdit }) {
   const router = useRouter();
-  const [startedAt, setStartedAt] = useState(workout.startedAt.slice(0, 16));
+  const [startedAt, setStartedAt] = useState(() => {
+    const d = new Date(workout.startedAt);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  });
   const [notes, setNotes] = useState(workout.notes ?? "");
   const [exercises, setExercises] = useState<ExerciseRow[]>(
     workout.exercises.length > 0

@@ -34,12 +34,12 @@ src/
 
 ## Route Protection via Middleware
 
-All `/dashboard` routes are protected by Clerk middleware in `src/middleware.ts`. The middleware is the **single enforcement point** — do not add `auth()` guard checks in layouts or pages for the purpose of redirecting unauthenticated users.
+All `/dashboard` routes are protected by Clerk middleware in `src/proxy.ts`. The proxy is the **single enforcement point** — do not add `auth()` guard checks in layouts or pages for the purpose of redirecting unauthenticated users.
 
 The public route matcher must explicitly allow the root page and Clerk auth routes. Everything else — including all `/dashboard` routes — is protected by default:
 
 ```ts
-// src/middleware.ts
+// src/proxy.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
